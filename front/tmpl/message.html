@@ -1,0 +1,61 @@
+<link href="../vendors/bootstrap-comment/css/comment-mini.css" rel="stylesheet" type="text/css">
+{{if list.length}}
+<ul id="message-sort" class="pagination">
+    <li sort-type="0"><a href="javascript:void(0);">最新回复排序</a></li>
+    <li sort-type="1"><a href="javascript:void(0);">留言时间排序</a></li>
+</ul>
+{{/if}}
+{{each list}}
+<div class="panel panel-white post panel-shadow">
+    <div class="post-heading">
+        <div class="pull-left image">
+            <img src="../vendors/bootstrap-comment/img/default-avatar.jpg"
+                 class="img-circle avatar"
+                 alt="user profile image">
+        </div>
+        <div class="pull-left meta">
+            <div class="title h5">
+                <a href="#"><b>{{$value.messageFromUserName}}</b></a>
+                对 {{$value.messageToUserName}} 留言
+            </div>
+            <h6 class="text-muted time">{{$value.messageDateTime}}</h6>
+        </div>
+    </div>
+    <div class="post-description">
+        <p>{{$value.messageContent}}</p>
+        <div class="stats" style="margin-bottom: 10px;">
+            <a role="message-btn" reply-target="{{$value.messageId}}" href="javascript:void(0);">
+                <i class="fa fa-comments"></i>回复
+                {{if $value.replayCount}}
+                <span id="reply_count_{{$value.messageId}}">{{$value.replayCount}}</span>
+                {{/if}}
+            </a>
+        </div>
+    </div>
+    <div class="post-footer" id="div_message_{{$value.messageId}}" style="display: none" role="message">
+        <div class="row">
+            <div class="col-lg-12">
+                <input type="hidden" id="messageId" name="messageId" value="{{$value.messageId}}">
+                <textarea class="form-control counted" id="replyContent" name="replyContent" placeholder="输入回复内容"
+                          rows="2"
+                          style="margin-bottom:5px;"></textarea>
+                <h6 class="pull-right" id="counter"></h6>
+                <a href="javascript:void(0);" class="btn btn-primary" role="reply-submit"><i
+                        class="fa fa-check-circle"></i>回复</a>
+            </div>
+        </div>
+        <ul class="comments-list" id="reply_{{$value.messageId}}">
+
+        </ul>
+        <ul id="reply-pager_{{$value.messageId}}" class="pagination">
+        </ul>
+    </div>
+</div>
+{{/each}}
+{{if list.length==0}}
+还没有留言
+{{/if}}
+{{if list.length}}
+<ul id="message-pager" class="pagination">
+</ul>
+{{/if}}

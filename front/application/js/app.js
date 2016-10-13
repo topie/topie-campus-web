@@ -1,0 +1,186 @@
+/**
+ * Created by chenguojun on 8/10/16.
+ */
+;
+(function ($, window, document, undefined) {
+    window.App = {
+        projectName: "/topie-campus",
+        href: "http://topiecampus.com",
+        requestMapping: {}
+    };
+
+    /**
+     * 下载文件
+     * @param href
+     */
+    App.download = function (href) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', ".." + href, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function () {
+            if (this.status === 200) {
+                var filename = "";
+                var disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    var matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
+                var type = xhr.getResponseHeader('Content-Type');
+                var blob = new Blob([this.response], {type: type});
+                if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                    // IE workaround for "HTML7007: One or more blob URLs were revoked by closing
+                    // the blob for which they were created. These URLs will no longer resolve as
+                    // the data backing the URL has been freed."
+                    window.navigator.msSaveBlob(blob, filename);
+                } else {
+                    var URL = window.URL || window.webkitURL;
+                    var downloadUrl = URL.createObjectURL(blob);
+
+                    if (filename) {
+                        // use HTML5 a[download] attribute to specify filename
+                        var a = document.createElement("a");
+                        // safari doesn't support this yet
+                        if (typeof a.download === 'undefined') {
+                            window.location = downloadUrl;
+                        } else {
+                            a.href = downloadUrl;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                        }
+                    } else {
+                        window.location = downloadUrl;
+                    }
+
+                    setTimeout(function () {
+                        URL.revokeObjectURL(downloadUrl);
+                    }, 100);
+                }
+            }
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Auth-Token', App.token);
+        xhr.send();
+    }
+
+    App.scrollTo = function (el, offeset) {
+        var pos = (el && el.size() > 0) ? el.offset().top : 0;
+
+        if (el) {
+            if ($('body').hasClass('page-header-fixed')) {
+                pos = pos - $('.page-header').height();
+            } else if ($('body').hasClass('page-header-top-fixed')) {
+                pos = pos - $('.page-header-top').height();
+            } else if ($('body').hasClass('page-header-menu-fixed')) {
+                pos = pos - $('.page-header-menu').height();
+            }
+            pos = pos + (offeset ? offeset : -1 * el.height());
+        }
+
+        $('html,body').animate({
+            scrollTop: pos
+        }, 'slow');
+    }
+
+    /**
+     * 更改右侧内容标题
+     * @param title
+     */
+    App.title = function (title) {
+        $("#main-title").text(title);
+    }
+    /**
+     * 右侧内容方法集合
+     * @type {{append: App.body.append, empty: App.body.empty}}
+     */
+    App.content = {
+        append: function (ele) {
+            $("#main-body").append(ele);
+        },
+        empty: function () {
+            $("#main-body").empty();
+        },
+        find: function (ele) {
+            return $("#main-body").find(ele);
+        }
+    }
+
+    App.$content = function () {
+        return $("#main-body");
+    };
+
+    App.messageLiTemplate = '<li class="${class_}" aria-controls="${pageto_}" id="${id_}" tabindex="0"><a style="${style_}" href="javascript:;">${num_}</a></li>';
+    App.messagePager = function (ul, pageNum, totalP) {
+        var firstLi = $.tmpl(App.messageLiTemplate, {
+            "class_": pageNum == 1 ? "disabled" : "prev",
+            "pageto_": 1,
+            "num_": "首页"
+        });
+        ul.append(firstLi);
+        if (totalP <= 5 && totalP > 0) {
+            for (var i = 1; i <= totalP; i++) {
+                var li = $.tmpl(App.messageLiTemplate, {
+                    "class_": pageNum == i ? "active"
+                        : "",
+
+                    "pageto_": i,
+                    "num_": i
+                });
+                ul.append(li);
+            }
+        } else if (totalP > 5) {
+            if (pageNum <= 3) {
+                for (var i = 1; i <= 5; i++) {
+                    var li = $
+                        .tmpl(
+                            App.messageLiTemplate,
+                            {
+                                "class_": pageNum == i ? "active"
+                                    : "",
+                                "id_": "",
+                                "pageto_": i,
+                                "num_": i
+                            });
+                    ul.append(li);
+                }
+            } else if (pageNum > 3 && pageNum < (totalP - 2)) {
+                for (var i = pageNum - 2; i <= pageNum + 2; i++) {
+                    var li = $
+                        .tmpl(
+                            App.messageLiTemplate,
+                            {
+                                "class_": pageNum == i ? "active"
+                                    : "",
+                                "id_": "",
+                                "pageto_": i,
+                                "num_": i
+                            });
+                    ul.append(li);
+                }
+            } else {
+                for (var i = totalP - 4; i <= totalP; i++) {
+                    var li = $
+                        .tmpl(
+                            App.messageLiTemplate,
+                            {
+                                "class_": pageNum == i ? "active"
+                                    : "",
+                                "id_": "",
+                                "pageto_": i,
+                                "num_": i
+                            });
+                    ul.append(li);
+                }
+            }
+        }
+        var lastLi = $.tmpl(App.messageLiTemplate, {
+            "class_": ((pageNum == totalP) || (totalP == 0)) ? "disabled" : "",
+            "pageto_": totalP,
+            "num_": "尾页"
+        });
+        ul.append(lastLi);
+    };
+})(jQuery, window, document);
