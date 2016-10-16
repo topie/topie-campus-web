@@ -44,9 +44,9 @@ table thead {
 }
 
 .user-head {
-    background: none repeat scroll 0 0 #6887c4;
+    background: none repeat scroll 0 0 #d9edf7;
     border-radius: 4px 0 0;
-    color: #fff;
+    color: #337ab7;
     min-height: 80px;
     padding: 10px;
 }

@@ -15,6 +15,11 @@ div.head-link {
     height: 80px;
 }
 
+div.head-link2 {
+    background: url("../img/hd_logo2.png") no-repeat left;
+    height: 80px;
+}
+
 .navbar {
     margin-bottom: 0;
     z-index: 999;
