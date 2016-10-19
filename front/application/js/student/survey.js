@@ -25,12 +25,14 @@
             field: "end"
         }, {
             title: "状态",
-            field: "isOnline",
+            field: "onlineStatus",
             format: function (i, data) {
-                if (data.isOnline) {
-                    return '<span class="label label-info">正在进行中</span>';
-                } else {
+                if (data.onlineStatus == 0) {
                     return '<span class="label label-default">未开始</span>';
+                } else if (data.onlineStatus == 1) {
+                    return '<span class="label label-info">进行中</span>';
+                } else {
+                    return '<span class="label label-warning">已结束</span>';
                 }
             }
         }
@@ -56,10 +58,13 @@
             actionColumnWidth: "25%",
             actionColumns: [
                 {
+                    visible: function (i, data) {
+                        return data.onlineStatus == 1;
+                    },
                     text: "参与",
                     cls: "btn-primary btn-sm",
                     handle: function (index, data) {
-                        window.open(App.href + "/front/survey.html?u=" + data.groupId);
+                        window.open(App.href + "/static/front/survey.html?u=" + data.groupId);
                     }
                 }
             ],
