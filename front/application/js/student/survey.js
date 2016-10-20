@@ -64,7 +64,7 @@
                     text: "参与",
                     cls: "btn-primary btn-sm",
                     handle: function (index, data) {
-                        window.open(App.href + "/static/front/survey.html?u=" + data.groupId);
+                        window.open(App.href + "/front/survey.html?u=" + data.groupId);
                     }
                 }
             ],
